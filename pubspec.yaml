@@ -1,0 +1,18 @@
+name: sscasn_2024_formations_to_json
+description: A sample command-line application.
+version: 1.0.0
+repository: https://github.com/acdwisu/sscasn-2024-formations-to-json
+
+environment:
+  sdk: ^3.4.3
+
+# Add regular dependencies here.
+dependencies:
+  cli_util: ^0.4.1
+  http: ^1.2.2
+  path: ^1.8.0
+  args: ^2.5.0
+
+dev_dependencies:
+  lints: ^3.0.0
+  test: ^1.24.0
