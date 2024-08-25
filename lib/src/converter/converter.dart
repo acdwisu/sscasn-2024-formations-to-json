@@ -14,8 +14,9 @@ abstract class IFormationsToJson {
 }
 
 class FormationsToJson extends IFormationsToJson {
-  FormationsToJson({required super.param})
-      : super(restExecutor: RestExecutor());
+  FormationsToJson({
+    required super.param,
+  }) : super(restExecutor: RestExecutor(param: param));
 
   @override
   Future<JsonResult> call() {
