@@ -3,11 +3,9 @@ import 'dart:developer';
 
 import 'package:cli_util/cli_logging.dart';
 import 'package:http/http.dart';
-import 'package:sscasn_2024_formations_to_json/src/converter/converter.dart';
+import 'package:sscasn_2024_formations_to_json/src/converter/formation_to_json.dart';
 import 'package:sscasn_2024_formations_to_json/src/converter/param.dart';
 import 'package:collection/collection.dart';
-
-enum ExecutionMode { sync, async }
 
 abstract class IRestExecutor {
   final FormationsToJsonParam param;
@@ -21,13 +19,12 @@ class RestExecutor extends IRestExecutor {
   RestExecutor({required super.param});
 
   @override
-  Future<JsonResult> call(
-      [ExecutionMode executionMode = ExecutionMode.sync]) async {
+  Future<JsonResult> call() async {
     final result = <JsonResult>[];
 
     final perPage = 10;
 
-    final logger = Logger.standard();
+    final logger = Logger.verbose();
 
     logger.stdout('start rest executor...');
 
@@ -49,16 +46,16 @@ class RestExecutor extends IRestExecutor {
 
     logger.stdout('total formations peeked: $totalFormations');
 
-    progress = logger.progress('executing in ${executionMode.name} mode');
+    progress = logger.progress('executing in ${param.executionMode.name} mode');
 
-    switch (executionMode) {
+    switch (param.executionMode) {
       case ExecutionMode.async:
         final loopCount = (totalFormations / perPage).ceil();
 
         final offsets = List.generate(loopCount, (index) => index * perPage);
 
         final formations = await Future.wait(offsets.map((offset) {
-          logger.stdout('executing at offset $offset');
+          // logger.stdout('executing at offset $offset');
 
           return _getFormationsJson(param.kodePendidikan, offset);
         }));
@@ -69,7 +66,7 @@ class RestExecutor extends IRestExecutor {
         var offset = 0;
 
         for (; offset < totalFormations; offset += perPage) {
-          logger.stdout('executing at offset $offset');
+          // logger.stdout('executing at offset $offset');
 
           final formations =
               await _getFormationsJson(param.kodePendidikan, offset);
@@ -141,6 +138,6 @@ class RestExecutor extends IRestExecutor {
 
     final rawJson = jsonDecode(response.body);
 
-    return rawJson['data']['data'];
+    return (rawJson['data']['data'] as List).cast<Map>();
   }
 }
